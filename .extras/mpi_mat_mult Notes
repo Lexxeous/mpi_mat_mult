@@ -1,0 +1,19 @@
+MPI 2D Arrays: https://stackoverflow.com/questions/5901476/sending-and-receiving-2d-array-over-mpi
+
+calculate start and end for each process
+if(mat_size % chunk_size == 0) // then the matrix was partitioned evenly amongst the processes
+{
+  perform send and recv based on uniform partitioning
+}
+else
+{
+  perform send and recv based on uneven partitioning
+}
+
+
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
+send rows one at a time using a while loop and a modulus until all rows are expended
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
