@@ -1,30 +1,39 @@
 # set default variables
 procs?=1
-size?=1000
+size?=10
 
 comp:
-	mpicc -o mpi_mat_mult mpi_mat_mult.c
+	# mpicc -o mpi_mat_mult mpi_mat_mult.c
+	mpiCC -o mpi_mat_mult mpi_test.cpp
 
 run:
 	mpirun -np $(procs) ./mpi_mat_mult $(size)
+	# mpirun -np $(procs) ./mpi_mat_mult
+
+debug:
+	# mpicc -g mpi_mat_mult.c
+	mpicc -g mpi_test.cpp
+
+gdb:
+	mpiexec -n $(procs) gdb ./a.out
 
 clean:
 	rm mpi_mat_mult
 
-hpc_1:
-	hpcshell --nodes=1 --tasks-per-node=1 --time=12:00:00
+hpc1:
+	hpcshell --nodes=1 --tasks-per-node=1
 
-hpc_2:
-	hpcshell --nodes=1 --tasks-per-node=2 --time=06:00:00
+hpc2:
+	hpcshell --nodes=1 --tasks-per-node=2
 
-hpc_4:
-	hpcshell --nodes=2 --tasks-per-node=2 --time=04:00:00
+hpc4:
+	hpcshell --nodes=2 --tasks-per-node=2
 
-hpc_8:
-	hpcshell --nodes=2 --tasks-per-node=4 --time=02:00:00
+hpc8:
+	hpcshell --nodes=2 --tasks-per-node=4
 
-hpc_16:
-	hpcshell --nodes=2 --tasks-per-node=8 --time=01:00:00
+hpc16:
+	hpcshell --nodes=2 --tasks-per-node=8
 
-hpc_28:
-	hpcshell --nodes=2 --tasks-per-node=14 --time=00:30:00
+hpc28:
+	hpcshell --nodes=2 --tasks-per-node=14

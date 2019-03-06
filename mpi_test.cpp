@@ -3,11 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+#include <cstdlib>
 
-// define RAND_MAX
-#ifndef RAND_MAX
-#define RAND_MAX ((int) ((unsigned) ~0 >> 1))
-#endif
+// declare namespace
+using namespace std;
 
 // prototype function(s)
 double range_rand_double(double low, double high);
@@ -26,21 +26,21 @@ int main(int argc, char* argv[])
 
 
   // command line arguments must be the executable & the matrix size: <mat_size>
-  // if (argc != 2 && world_rank == 0)
-  // {
-  //   printf("ERR:2:ARGC >> Wrong number of command line arguments.\nUse ./<executable> <mat_size> as format.\n");
-  //   return -2;
-  // }
+  if (argc != 2 && world_rank == 0)
+  {
+    printf("ERR:2:ARGC >> Wrong number of command line arguments.\nUse ./<executable> <mat_size> as format.\n");
+    return -2;
+  }
 
 
   // defining necessary variables
-	// int mat_size = atoi(argv[1]); // user specified matrix size
-	// int chunk_size = mat_size / world_size;
+	int mat_size = atoi(argv[1]); // user specified matrix size
+	int chunk_size = mat_size / world_size;
 	double double_lower_bound = 0;
 	double double_upper_bound = 500000;
 
 
-	srand((double) time(NULL)); // randomize seed based on current time
+	srand(time(NULL)); // randomize seed based on current time
 
 	// int A[10][10] = {0,0,0,0,0,0,0,0,0,0,
 	// 								 1,1,1,1,1,1,1,1,1,1,
@@ -64,33 +64,41 @@ int main(int argc, char* argv[])
 	// 								 8,8,8,8,8,8,8,8,8,8,
 	// 								 9,9,9,9,9,9,9,9,9,9};
 
- //  int C[10][10];
+  //  int C[10][10];
 
-	// cout << endl << "Creating square matricies of size " << mat_size << "..." << endl;
-	// double A[mat_size][mat_size];
-	// double B[mat_size][mat_size];
-	// double C[mat_size][mat_size];
+	cout << endl << "Creating square matricies of size " << mat_size << "..." << endl;
+	double A[mat_size][mat_size];
+	double B[mat_size][mat_size];
+	double C[mat_size][mat_size];
 
-	double A[10][10];
-	double B[10][10];
-	double C[10][10];
+	// // allocating the matrices
+	// cout << endl << "Creating square matricies of size 10 with random double values..." << endl;
+	// double** A, B, C;
+	// A = calloc(10, sizeof(double*));
+	// B = calloc(10, sizeof(double*));
+	// C = calloc(10, sizeof(double*));
+	// for (int i = 0; i < 10; i++)
+	// {
+	//   A[i] = calloc(10, sizeof(double));
+	//   B[i] = calloc(10, sizeof(double));
+	//   C[i] = calloc(10, sizeof(double));
+	// }
+
 
 	printf("\nInitializing random values...\n");
-	int init_row, init_col;
-	for(init_row = 0; init_row < 10; init_row++)
+	for(int init_row = 0; init_row < mat_size; init_row++)
 	{
-		for(init_col = 0; init_col < 10; init_row++)
+		for(int init_col = 0; init_col < mat_size; init_row++)
 		{
 			A[init_row][init_col] = range_rand_double(double_lower_bound, double_upper_bound);
 			B[init_row][init_col] = range_rand_double(double_lower_bound, double_upper_bound);
 		}
 	}
 
-	// print matrix A
-  int arow, acol;									 
-	for(arow=0; arow<10; arow++)
+	// print matrix A								 
+	for(int arow=0; arow<mat_size; arow++)
 	{
-		for(acol=0; acol<10; acol++)
+		for(int acol=0; acol<mat_size; acol++)
 		{
 			printf("%lf\t", A[arow][acol]);
 		}
@@ -99,11 +107,10 @@ int main(int argc, char* argv[])
 	printf("\n");
 
 
-	// print matrix B
-	int brow, bcol;									 
-	for(brow=0; brow<10; brow++)
+	// print matrix B							 
+	for(int brow=0; brow<mat_size; brow++)
 	{
-		for(bcol=0; bcol<10; bcol++)
+		for(int bcol=0; bcol<mat_size; bcol++)
 		{
 			printf("%lf\t", B[brow][bcol]);
 		}
@@ -116,13 +123,12 @@ int main(int argc, char* argv[])
 
 
 	//multiply square matricies
-	int i, j, k;
-	for(i=0; i<10; i++)
+	for(int i=0; i<mat_size; i++)
 	{
-	  for(j=0; j<10; j++)
+	  for(int j=0; j<mat_size; j++)
 	  {
 	    double curr_cell = 0; // initialize each new cell with 0
-	    for(k=0; k<10; k++)
+	    for(int k=0; k<mat_size; k++)
 	    {
 	      curr_cell += A[i][k]*B[k][j];
 			}
@@ -148,8 +154,8 @@ int main(int argc, char* argv[])
 	double seq_time = make_time;
 	double parallel_time = mult_time;
 
-	printf("\nMatrices of square size 10 were sequentially created & initialized in %lf seconds.\n", seq_time);
-	printf("\nMatrices of square size 10 were multiplied in parallel in %lf seconds.\n", parallel_time);
+	printf("\nRandomized matrices (of type \"double\" & of square size %d) were sequentially created & initialized in %lf seconds.\n", mat_size, seq_time);
+	printf("\nRandomized matrices (of type \"double\" & of square size %d) were multiplied in parallel in %lf seconds.\n", mat_size, parallel_time);
 
 	MPI_Finalize();
 }
@@ -157,7 +163,6 @@ int main(int argc, char* argv[])
 
 double range_rand_double(double low, double high)
 {
-  double range = high - low;
-
-  return ((double) rand() / (double) RAND_MAX * (range - 1)) + low;
+  double range = high - low; // get the range of values
+  return (rand() / double (RAND_MAX) * (range - 1)) + low; // return a random double between high and low
 }
