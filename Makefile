@@ -1,10 +1,11 @@
 # set default variables
-procs?=3
-size?=10
+procs?=8
+size?=3000
 
 comp:
 	# mpicc -o mpi_mat_mult mpi_mat_mult.c
-	mpiCC -o mpi_mat_mult mpi_test.cpp
+	# mpiCC -o mpi_mat_mult mpi_test.cpp
+	mpiCC -o mpi_mat_mult mpi_sim.cpp
 
 run:
 	# mpiexec -np $(procs) ./mpi_mat_mult $(size)
@@ -16,11 +17,12 @@ debug:
 	mpiCC -g mpi_test.cpp
 
 gdb:
-	# mpiexec -n $(procs) gdb ./a.out $(size)
-	mpiexec -n $(procs) gdb ./a.out
+	# mpiexec -np $(procs) -d ./a.out $(size)
+	mpiexec -d -np $(procs) ./mpi_mat_mult $(size)
+	# mpiexec -n $(procs) gdb ./a.out
 
 clean:
-	rm mpi_mat_mult mat_mult_result.out
+	rm mpi_mat_mult mat_mult_result.out a.out
 
 hpc1: # 1 process
 	hpcshell --nodes=1 --tasks-per-node=1

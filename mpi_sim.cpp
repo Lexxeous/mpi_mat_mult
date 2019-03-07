@@ -16,6 +16,9 @@ double range_rand_double(double low, double high);
 // start main
 int main(int argc, char* argv[])
 {
+	int mat_size = atoi(argv[1]); // user specified matrix size
+	double C[mat_size][mat_size]; // create C as a "global" matrix?
+
 	// initialize the MPI environment
   MPI_Init(NULL, NULL);
   int world_size, world_rank;
@@ -39,7 +42,6 @@ int main(int argc, char* argv[])
 
 
   // defining necessary variables
-	int mat_size = atoi(argv[1]); // user specified matrix size
 	int chunk_size = floor(mat_size / world_size);
 	int unique_rows = (mat_size % world_size) + chunk_size;
 	double double_lower_bound = 0;
@@ -57,44 +59,33 @@ int main(int argc, char* argv[])
   MPI_Barrier(MPI_COMM_WORLD);
 	
 
-	// every process gets there own instance of matrices A & B
-	double A[10][10] = {0,0,0,0,0,0,0,0,0,0,
-									 1,1,1,1,1,1,1,1,1,1,
-									 2,2,2,2,2,2,2,2,2,2,
-									 3,3,3,3,3,3,3,3,3,3,
-									 4,4,4,4,4,4,4,4,4,4,
-									 5,5,5,5,5,5,5,5,5,5,
-									 6,6,6,6,6,6,6,6,6,6,
-									 7,7,7,7,7,7,7,7,7,7,
-									 8,8,8,8,8,8,8,8,8,8,
-									 9,9,9,9,9,9,9,9,9,9};
+	// // every process gets there own instance of matrices A & B
+	// double A[10][10] = {0,0,0,0,0,0,0,0,0,0,
+	// 								 1,1,1,1,1,1,1,1,1,1,
+	// 								 2,2,2,2,2,2,2,2,2,2,
+	// 								 3,3,3,3,3,3,3,3,3,3,
+	// 								 4,4,4,4,4,4,4,4,4,4,
+	// 								 5,5,5,5,5,5,5,5,5,5,
+	// 								 6,6,6,6,6,6,6,6,6,6,
+	// 								 7,7,7,7,7,7,7,7,7,7,
+	// 								 8,8,8,8,8,8,8,8,8,8,
+	// 								 9,9,9,9,9,9,9,9,9,9};
 
-  double B[10][10] = {0,0,0,0,0,0,0,0,0,0,
-									 1,1,1,1,1,1,1,1,1,1,
-									 2,2,2,2,2,2,2,2,2,2,
-									 3,3,3,3,3,3,3,3,3,3,
-									 4,4,4,4,4,4,4,4,4,4,
-									 5,5,5,5,5,5,5,5,5,5,
-									 6,6,6,6,6,6,6,6,6,6,
-									 7,7,7,7,7,7,7,7,7,7,
-									 8,8,8,8,8,8,8,8,8,8,
-									 9,9,9,9,9,9,9,9,9,9};
+ //  double B[10][10] = {0,0,0,0,0,0,0,0,0,0,
+	// 								 1,1,1,1,1,1,1,1,1,1,
+	// 								 2,2,2,2,2,2,2,2,2,2,
+	// 								 3,3,3,3,3,3,3,3,3,3,
+	// 								 4,4,4,4,4,4,4,4,4,4,
+	// 								 5,5,5,5,5,5,5,5,5,5,
+	// 								 6,6,6,6,6,6,6,6,6,6,
+	// 								 7,7,7,7,7,7,7,7,7,7,
+	// 								 8,8,8,8,8,8,8,8,8,8,
+	// 								 9,9,9,9,9,9,9,9,9,9};
 
-
-	// each processes gets there own temporary C matrix based on <mat_size> & <world_size>
-	double** temp_C;
-  if(world_rank == world_size - 1) // last process goes here
-  {
-  	temp_C[unique_rows][mat_size];
-  }
-  else // processes 0 ~ <world_size> - 1 go here
-  {
-  	temp_C[chunk_size][mat_size];
-  }
 
 	
-	// double A[mat_size][mat_size];
-	// double B[mat_size][mat_size];
+	double A[mat_size][mat_size];
+	double B[mat_size][mat_size];
 	// double temp_C[mat_size][mat_size];
 
 	// // allocating the matrices
@@ -132,43 +123,51 @@ int main(int argc, char* argv[])
 	// }
 
 
-	// cout << "\nInitializing random values...\n\n";
-	// for(int init_row = 0; init_row < mat_size; init_row++)
-	// {
-	// 	for(int init_col = 0; init_col < mat_size; init_col++)
+	if(world_rank == 0)
+	{
+		cout << "\nInitializing random values...\n";	
+	}
+	MPI_Barrier(MPI_COMM_WORLD);
+	
+
+	// every process gets there own instances of A & B
+	for(int init_row = 0; init_row < mat_size; init_row++)
+	{
+		for(int init_col = 0; init_col < mat_size; init_col++)
+		{
+			A[init_row][init_col] = range_rand_double(double_lower_bound, double_upper_bound);
+			B[init_row][init_col] = range_rand_double(double_lower_bound, double_upper_bound);
+		}
+	}
+
+ //  // print the original matrices only once
+ //  if(world_rank == 0)
+ //  {
+	// 	// print matrix A								 
+	// 	for(int a_row = 0; a_row < mat_size; a_row++)
 	// 	{
-	// 		A[init_row][init_col] = range_rand_double(double_lower_bound, double_upper_bound);
-	// 		B[init_row][init_col] = range_rand_double(double_lower_bound, double_upper_bound);
+	// 		for(int a_col = 0; a_col < mat_size; a_col++)
+	// 		{
+	// 			cout << A[a_row][a_col] << "\t";
+	// 		}
+	// 		cout << "\n";
 	// 	}
-	// }
-
-  // print the original matrices only once
-  if(world_rank == 0)
-  {
-		// print matrix A								 
-		for(int a_row = 0; a_row < mat_size; a_row++)
-		{
-			for(int a_col = 0; a_col < mat_size; a_col++)
-			{
-				cout << A[a_row][a_col] << "\t";
-			}
-			cout << "\n";
-		}
-		cout << "\n";
+	// 	cout << "\n";
 
 
-		// print matrix B							 
-		for(int b_row = 0; b_row < mat_size; b_row++)
-		{
-			for(int b_col = 0; b_col < mat_size; b_col++)
-			{
-				cout << B[b_row][b_col] << "\t";
-			}
-			cout << "\n";
-		}
-		cout << "\n";
+	// 	// print matrix B							 
+	// 	for(int b_row = 0; b_row < mat_size; b_row++)
+	// 	{
+	// 		for(int b_col = 0; b_col < mat_size; b_col++)
+	// 		{
+	// 			cout << B[b_row][b_col] << "\t";
+	// 		}
+	// 		cout << "\n";
+	// 	}
+	// 	cout << "\n";
 
-
+	if(world_rank == 0)
+	{
 		make_time = MPI_Wtime() - start_time; // seqential creation and initialization time
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
@@ -187,6 +186,8 @@ int main(int argc, char* argv[])
 		cout << "\nGenerating matrix C by square matrix multiplication (C = A•B) with " 
 				 << world_size << " processes and a chunk size of " << chunk_size << "...\n";
 	}
+	MPI_Barrier(MPI_COMM_WORLD);
+
 
   int curr_rank = 0;
 	while(curr_rank < world_size)
@@ -202,8 +203,6 @@ int main(int argc, char* argv[])
 
 	//multiply square matricies
 	double curr_cell;
-	int unique_itr = 0;
-	int eq_itr = 0;
 	for(int mult_row = start; mult_row <= end; mult_row++)
 	{
 	  for(int mult_col = 0; mult_col < mat_size; mult_col++)
@@ -213,46 +212,11 @@ int main(int argc, char* argv[])
 	    {
 	      curr_cell += A[mult_row][itr]*B[itr][mult_col];
 			}
-
-			if((world_rank != world_size - 1) && (eq_itr < chunk_size))
-			{
-				temp_C[eq_itr][mult_col] = curr_cell;
-			}
-			else if((world_rank == world_size - 1) && (unique_itr < unique_rows))
-			{
-				temp_C[unique_itr][mult_col] = curr_cell;
-			}
+			C[mult_row][mult_col] = curr_cell;
+			// cout << C[mult_row][mult_col] << "\t"; // for printing each element
 		}
-		eq_itr++;
-		unique_itr++;
+		// cout << endl; // for ending each row
 	}
-
-
-	// print each <temp_C>
-	cout << "\nI am process " << world_rank << " and this is my partitioned portion of the final matrix C:\n";
-	if(world_rank == world_size - 1) // last process goes here
-  {
-  	for(int unique_row = 0; unique_row < unique_rows; unique_row++)
-  	{
-  		for(int unique_col = 0; unique_col < mat_size; unique_col++)
-  		{
-  			cout << temp_C[unique_row][unique_col] << "\t";
-  		}
-  		cout << "\n";
-  	}
-  }
-  else // processes 0 ~ <world_size> - 1 go here
-  {
-  	for(int eq_row = 0; eq_row < chunk_size; eq_row++)
-  	{
-  		for(int eq_col = 0; eq_col < mat_size; eq_col++)
-  		{
-  			cout << temp_C[eq_row][eq_col] << "\t";
-  		}
-  		cout << "\n";
-  	}
-	}
-	MPI_Barrier(MPI_COMM_WORLD);
 
 
 	if(world_rank == 0)
@@ -261,10 +225,10 @@ int main(int argc, char* argv[])
 
 	  // output sequential and parallel execution times
 	  cout << "\nRandomized matrices (of type \"double\" & of square size " << mat_size
-						 << ") were sequentially created & initialized in " << make_time << " seconds.\n";
+				 << ") were sequentially created & initialized in " << make_time << " seconds.\n";
 
 		cout << "\nRandomized matrices (of type \"double\" & of square size " << mat_size
-						 << ") were multiplied in parallel in " << mult_time << " seconds.\n";
+				 << ") were multiplied in parallel in " << mult_time << " seconds.\n";
 	}
 
 
