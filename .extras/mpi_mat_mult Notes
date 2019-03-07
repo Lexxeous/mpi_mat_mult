@@ -17,3 +17,5 @@ else
 send rows one at a time using a while loop and a modulus until all rows are expended
 
 ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
+Let process 0 do all the work for dynamically creating and passing whole matrices to other processes. Then each processes calculates its own start and end values.
