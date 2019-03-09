@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
   	cout << "Results for: " << world_size << " processes, chunk sizes of " << chunk_size << ", and matrix sizes of " << mat_size << "...\n";
   	cout << "\nCreating square matricies of size " << mat_size << "...\n";
   }
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(MPI_COMM_WORLD); // barricade processes to print messages in correct order
 
 
 	// every process gets its own instance of matrices A & B
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 	{
 		cout << "\nInitializing random values...\n";	
 	}
-	MPI_Barrier(MPI_COMM_WORLD);
+	MPI_Barrier(MPI_COMM_WORLD); // barricade processes to print messages in correct order
 	
 
 	// every process gets there own instances of A & B
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 		cout << "\nGenerating matrix C by square matrix multiplication (C = A•B) with " 
 				 << world_size << " processes and a chunk size of " << chunk_size << "...\n";
 	}
-	MPI_Barrier(MPI_COMM_WORLD);
+	MPI_Barrier(MPI_COMM_WORLD); // barricade processes to print messages in correct order
 
 
   int curr_rank = 0;
@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 			cout << "\nProcess " << world_rank << " starts at row " << start << " and ends at row " << end << "...\n";
     }
    curr_rank++;
-   MPI_Barrier(MPI_COMM_WORLD);
+   MPI_Barrier(MPI_COMM_WORLD); // barricade processes to print messages in correct order
 	}
 
 
@@ -152,18 +152,7 @@ int main(int argc, char* argv[])
 	}
 
 
-	// // cleanup
-	// for(int i = 0; i < 10; ++i)
-	// {
-	//   delete[] A[i];
-	//   delete[] B[i];
-	//   delete[] temp_C[i];
-	// }
-	// delete[] A;
-	// delete[] B;
-	// delete[] temp_C;
-
-	MPI_Finalize();
+	MPI_Finalize(); // finalize the MPI environment
 }
 
 
