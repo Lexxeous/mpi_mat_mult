@@ -1,5 +1,5 @@
 # set default variables
-procs?=2
+procs?=1
 size?=1000
 
 comp:
