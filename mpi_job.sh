@@ -3,4 +3,4 @@
 #SBATCH --tasks-per-node=1
 #SBATCH --time=00:10:00
 
-mpirun -np 1 ./mpi_mat_mult 1000
+mpirun -np 1 ./mpi_mat_mult 20

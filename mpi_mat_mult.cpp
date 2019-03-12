@@ -142,9 +142,9 @@ int main(int argc, char* argv[])
 	      curr_cell += A[mult_row][itr]*B[itr][mult_col];
 			}
 			C[mult_row][mult_col] = curr_cell;
-			// cout << C[mult_row][mult_col] << "\t"; // for printing each element
+			cout << C[mult_row][mult_col] << "\t"; // for printing each element
 		}
-		// cout << endl; // for ending each row
+		cout << endl; // for ending each row
 	}
 
 
